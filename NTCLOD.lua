@@ -141,8 +141,9 @@ local function showLoadingBar()
 		task.wait(0.5)
 		screenGui:Destroy()
 
+		getgenv().uiSize = UDim2.fromOffset(580, 400)
 
-		print("Main script now running.")
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 	end)
 end
 
