@@ -2,7 +2,6 @@ local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
-game:GetService("Players").LocalPlayer.PlayerGui.Top_Notification:Destroy()
 local function applyCorner(instance, radius)
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, radius)
