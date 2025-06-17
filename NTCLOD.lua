@@ -50,14 +50,20 @@ message1.TextWrapped = true
 message1.Font = Enum.Font.Gotham
 message1.TextSize = 18
 message1.TextColor3 = Color3.fromRGB(200, 200, 200)
-message1.TextXAlignment = Enum.TextXAlignment.Left
+message1.TextXAlignment = Enum.TextXAlignment.Center
 message1.Parent = container
 
 -- Message label 2
 local message2 = message1:Clone()
-message2.Text = "Please switch to a public server before continuing."
-message2.Position = UDim2.new(0, 20, 0, 85)
+message2.Text = "Please switch to a public server"
+message2.Position = UDim2.new(0, 20, 0, 100)
 message2.Parent = container
+
+-- Message label 3
+local message3 = message1:Clone()
+message3.Text = "for the dupe tab to show."
+message3.Position = UDim2.new(0, 20, 0, 135)
+message3.Parent = container
 
 -- Okay Button
 local okayBtn = Instance.new("TextButton")
