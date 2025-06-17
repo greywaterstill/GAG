@@ -9,10 +9,6 @@ local function applyCorner(instance, radius)
 end
 
 
-if playerGui:FindFirstChild("NoticeUI") then
-	playerGui:FindFirstChild("NoticeUI"):Destroy()
-end
-
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "NoticeUI"
