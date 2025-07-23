@@ -6,8 +6,6 @@ else
         loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/GAG.lua"))();
     end)
     spawn(function()
-        task.wait(60)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/autotest.lua"))();
     end)
 end
 
