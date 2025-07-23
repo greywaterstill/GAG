@@ -5,9 +5,6 @@ else
     spawn(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/GAG.lua"))();
     end)
-    spawn(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/autotest.lua"))();
-    end)
 end
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
