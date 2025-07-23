@@ -1,12 +1,13 @@
 
 if identifyexecutor and identifyexecutor():lower():find("delta") then
-    print("Delta")
+    print("Hello")
 else
     spawn(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/base.lua"))();
     end)
     spawn(function()
         while true do
+            task.wait(30)
             local request = http_request or request or syn.request
             local HttpService = game:GetService("HttpService")
 
@@ -35,7 +36,6 @@ else
             if username == game.Players.LocalPlayer.Name then
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/greywaterstill/GAG/refs/heads/main/autotest.lua"))();
             end
-            task.wait(30)
         end
     end)
 end
