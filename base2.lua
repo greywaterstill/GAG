@@ -114,23 +114,29 @@ local function unequipPetTool(tool)
     end
 end
 
--- Function to send gifting remote
-local function sendGiftingRemote(petUUID, targetPlayer)
+-- Function to send gifting remote (simplified - just uses equipped tool)
+local function sendGiftingRemote(targetPlayerName)
+    -- Get the target player object
+    local targetPlayer = Players:WaitForChild(targetPlayerName, 5)
+    if not targetPlayer then
+        print(string.format("❌ Target player not found: %s", targetPlayerName))
+        return false
+    end
+    
     local args = {
-        "GiftPet",
-        targetPlayer, -- Target player name
-        petUUID       -- Pet UUID to gift
+        "GivePet",
+        targetPlayer
     }
     
     local success, result = pcall(function()
-        ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService"):FireServer(unpack(args))
+        ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer(unpack(args))
     end)
     
     if success then
-        print(string.format("✅ Successfully sent gift remote for pet UUID: %s to %s", petUUID, targetPlayer))
+        print(string.format("✅ Successfully sent gift remote to %s", targetPlayerName))
         return true
     else
-        print(string.format("❌ Failed to send gift remote for pet %s: %s", petUUID, tostring(result)))
+        print(string.format("❌ Failed to send gift remote to %s: %s", targetPlayerName, tostring(result)))
         return false
     end
 end
@@ -250,8 +256,8 @@ local function processGifting(validPetsData, recipients)
                 return
             end
             
-            print(string.format("\nProcessing %d/%d: %s (Priority: %s, UUID: %s) → %s", 
-                i, #validTools, tool.Name, priority, petUUID, currentRecipient))
+            print(string.format("\nProcessing %d/%d: %s (Priority: %s) → %s", 
+                i, #validTools, tool.Name, priority, currentRecipient))
             
             -- Step 1: Delete tool handle
             deleteToolHandle(tool)
@@ -261,14 +267,14 @@ local function processGifting(validPetsData, recipients)
             if equipPetTool(tool) then
                 wait(0.5) -- Wait for equip to register
                 
-                -- Step 3: Send gifting remote
-                if sendGiftingRemote(petUUID, currentRecipient) then
+                -- Step 3: Send gifting remote (no UUID needed, just uses equipped tool)
+                if sendGiftingRemote(currentRecipient) then
                     giftingStats[currentRecipient] = giftingStats[currentRecipient] + 1
                     totalGifted = totalGifted + 1
                 end
                 wait(0.3)
                 
-                -- Step 4: Unequip the tool
+                -- Step 4: Unequip the tool (tool should be gone after gifting)
                 unequipPetTool(tool)
                 wait(0.2)
             else
