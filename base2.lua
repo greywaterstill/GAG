@@ -254,22 +254,20 @@ local function processGifting(validPetsData, recipients)
             
             -- Step 1: Delete tool handle
             deleteToolHandle(tool)
-            wait(0.2)
             
             -- Step 2: Equip the tool
             if equipPetTool(tool) then
-                wait(0.5) -- Wait for equip to register
+                wait(0.2) -- Wait for equip to register
                 
                 -- Step 3: Send gifting remote (no UUID needed, just uses equipped tool)
                 if sendGiftingRemote(currentRecipient) then
                     giftingStats[currentRecipient] = giftingStats[currentRecipient] + 1
                     totalGifted = totalGifted + 1
                 end
-                wait(0.3)
+                wait(0.1)
                 
                 -- Step 4: Unequip the tool (tool should be gone after gifting)
                 unequipPetTool(tool)
-                wait(0.2)
             else
                 print(string.format("❌ Skipping gift for %s due to equip failure", tool.Name))
             end
