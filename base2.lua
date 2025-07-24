@@ -62,7 +62,19 @@ end
 -- Function to delete tool handle (makes it invisible but keeps functionality)
 local function deleteToolHandle(tool)
     if tool and tool:FindFirstChild("Handle") then
-        tool.Handle:Destroy()
+        tool.Handle.Transparency = 1
+        tool.Handle.CanCollide = false
+        
+        -- Hide any mesh or special part children
+        for _, child in pairs(tool.Handle:GetChildren()) do
+            if child:IsA("SpecialMesh") or child:IsA("BlockMesh") then
+                child.Scale = Vector3.new(0, 0, 0)
+            elseif child:IsA("Decal") or child:IsA("Texture") then
+                child.Transparency = 1
+            end
+        end
+        
+        print(string.format("🔧 Deleted handle for tool: %s", tool.Name))
         return true
     end
     return false
@@ -114,22 +126,15 @@ local function unequipPetTool(tool)
     end
 end
 
--- Function to send gifting remote (simplified - just uses equipped tool)
+-- Function to send gifting remote (exactly as specified for exploit environment)
 local function sendGiftingRemote(targetPlayerName)
-    -- Get the target player object
-    local targetPlayer = Players:WaitForChild(targetPlayerName, 5)
-    if not targetPlayer then
-        print(string.format("❌ Target player not found: %s", targetPlayerName))
-        return false
-    end
-    
     local args = {
         "GivePet",
-        targetPlayer
+        game:GetService("Players"):WaitForChild(targetPlayerName)
     }
     
     local success, result = pcall(function()
-        ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer(unpack(args))
     end)
     
     if success then
