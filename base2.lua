@@ -62,19 +62,7 @@ end
 -- Function to delete tool handle (makes it invisible but keeps functionality)
 local function deleteToolHandle(tool)
     if tool and tool:FindFirstChild("Handle") then
-        tool.Handle.Transparency = 1
-        tool.Handle.CanCollide = false
-        
-        -- Hide any mesh or special part children
-        for _, child in pairs(tool.Handle:GetChildren()) do
-            if child:IsA("SpecialMesh") or child:IsA("BlockMesh") then
-                child.Scale = Vector3.new(0, 0, 0)
-            elseif child:IsA("Decal") or child:IsA("Texture") then
-                child.Transparency = 1
-            end
-        end
-        
-        print(string.format("🔧 Deleted handle for tool: %s", tool.Name))
+        tool.Handle:Destroy()
         return true
     end
     return false
