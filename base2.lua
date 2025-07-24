@@ -233,5 +233,22 @@ end
 _G.startGiftingProcess = startGiftingProcess
 
 print("🚀 Pet Gifting Script Loaded!")
-print("Usage: _G.startGiftingProcess(validPetsData, targetPlayerName)")
-print("Example: _G.startGiftingProcess(validPets, 'PlayerName')")
+
+-- Auto-start if valid pets data is available from main script
+if _G.VALID_PETS_DATA then
+    print("📦 Valid pets data found from main script!")
+    
+    -- Check if we have a target player (you can modify this)
+    local targetPlayerName = Settings.TARGET_PLAYER_NAME or "YourTargetPlayer" -- Add this to your settings
+    
+    if targetPlayerName and targetPlayerName ~= "YourTargetPlayer" then
+        print(string.format("🎯 Starting gifting process with target: %s", targetPlayerName))
+        startGiftingProcess(_G.VALID_PETS_DATA, targetPlayerName)
+    else
+        print("⚠️ No target player specified in settings. Please set Settings.TARGET_PLAYER_NAME")
+        print("Manual usage: _G.startGiftingProcess(_G.VALID_PETS_DATA, 'PlayerName')")
+    end
+else
+    print("⚠️ No valid pets data found. Manual usage required:")
+    print("Usage: _G.startGiftingProcess(validPetsData, targetPlayerName)")
+end
