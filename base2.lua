@@ -157,12 +157,23 @@ local function getValidPetToolsFromData(validPetsData)
         return validTools
     end
     
+    -- Debug: Show what data we received
+    print("🔍 DEBUG: Received validPetsData structure:")
+    for priority, pets in pairs(validPetsData) do
+        print(string.format("   Priority %s: %d pets", priority, #pets))
+        for i, petData in ipairs(pets) do
+            print(string.format("      Pet %d: UUID=%s, Name=%s, Source=%s", 
+                i, petData.uuid or "nil", petData.name or "nil", petData.source or "nil"))
+        end
+    end
+    
     -- Create a lookup table of valid UUIDs from all priorities
     local validUUIDs = {}
     for priority, pets in pairs(validPetsData) do
         for _, petData in ipairs(pets) do
-            if petData.pet and petData.pet.uuid then
-                validUUIDs[petData.pet.uuid] = {
+            -- The main script passes petData.uuid directly, not petData.pet.uuid
+            if petData.uuid then
+                validUUIDs[petData.uuid] = {
                     priority = priority,
                     petData = petData
                 }
@@ -170,18 +181,26 @@ local function getValidPetToolsFromData(validPetsData)
         end
     end
     
+    print(string.format("🔍 DEBUG: Created lookup table with %d UUIDs", 
+        (function() local count = 0; for _ in pairs(validUUIDs) do count = count + 1 end; return count end)()))
+    
     -- Find tools in backpack that match valid UUIDs
+    print("🔍 DEBUG: Scanning backpack tools...")
     for _, tool in pairs(backpack:GetChildren()) do
         if tool:IsA("Tool") and tool:GetAttribute("PET_UUID") then
             local petUUID = tool:GetAttribute("PET_UUID")
+            print(string.format("   Found tool: %s with UUID: %s", tool.Name, petUUID))
             
             if validUUIDs[petUUID] then
+                print(string.format("   ✅ Matching UUID found for: %s", tool.Name))
                 table.insert(validTools, {
                     tool = tool,
                     uuid = petUUID,
                     priority = validUUIDs[petUUID].priority,
                     petData = validUUIDs[petUUID].petData
                 })
+            else
+                print(string.format("   ❌ UUID not in valid list: %s", tool.Name))
             end
         end
     end
@@ -192,6 +211,8 @@ local function getValidPetToolsFromData(validPetsData)
         return priorityOrder[a.priority] < priorityOrder[b.priority]
     end)
     
+    print(string.format("🔍 DEBUG: Final valid tools count: %d", #validTools))
+    
     return validTools
 end
 
@@ -199,6 +220,12 @@ end
 local function processGifting(validPetsData, recipients)
     print("=== STARTING PET GIFTING PROCESS ===")
     print(string.format("📋 Recipients: %s", table.concat(recipients, ", ")))
+    
+    -- Debug: Show received data structure
+    print("🔍 DEBUG: Received valid pets data:")
+    for priority, pets in pairs(validPetsData) do
+        print(string.format("   %s: %d pets", priority, #pets))
+    end
     
     local cycle = 1
     local totalGifted = 0
